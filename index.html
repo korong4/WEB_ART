@@ -1,341 +1,561 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Museu do Conhecimento Matematico</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#111;overflow:hidden;font-family:'Georgia',serif;touch-action:none;}
-#canvas{display:block;width:100vw;height:100vh;}
-#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;pointer-events:none;z-index:10;}
-#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,0.35);}
-#crosshair::before{width:1px;height:100%;left:50%;}
-#crosshair::after{width:100%;height:1px;top:50%;}
-#overlay{position:fixed;inset:0;background:rgba(255,255,255,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity 1.2s ease;text-align:center;padding:32px 24px;overflow-y:auto;}
-#overlay h1{font-size:clamp(1.4rem,4vw,2.6rem);color:#111;font-weight:300;letter-spacing:0.12em;margin-bottom:0.3em;}
-#overlay .sub{font-size:clamp(0.7rem,1.4vw,0.9rem);color:#777;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:2em;}
-#overlay p{font-size:clamp(0.8rem,1.1vw,0.95rem);color:#444;max-width:480px;line-height:1.9;margin-bottom:0.7em;}
-#overlay .warn{font-size:0.75rem;color:#999;font-style:italic;margin-top:1em;}
-#enter-btn{margin-top:2em;padding:13px 42px;background:transparent;border:1px solid #222;color:#222;font-family:'Georgia',serif;font-size:0.9rem;letter-spacing:0.2em;cursor:pointer;transition:all 0.3s;text-transform:uppercase;}
-#enter-btn:hover,#enter-btn:active{background:#111;color:#fff;}
-#ctrl-hint{margin-top:1.2em;font-size:0.7rem;color:#bbb;line-height:1.8;}
-#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:18px 24px;pointer-events:none;z-index:20;}
-#hud-title{font-size:0.6rem;color:rgba(255,255,255,0.4);letter-spacing:0.3em;text-transform:uppercase;}
-#hud-disc{font-size:0.6rem;color:rgba(255,255,255,0.4);letter-spacing:0.2em;}
-#entropy{position:fixed;bottom:20px;right:24px;z-index:20;pointer-events:none;text-align:right;}
-#entropy-label{font-size:0.55rem;color:rgba(255,255,255,0.3);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:5px;}
-#entropy-bar{width:70px;height:1px;background:rgba(255,255,255,0.08);display:inline-block;}
-#entropy-fill{height:100%;background:rgba(255,80,80,0.6);width:0%;transition:width 0.5s;}
-#info-panel{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(255,255,255,0.96) 28%);padding:50px 28px 24px;pointer-events:none;transform:translateY(100%);transition:transform 0.55s cubic-bezier(0.16,1,0.3,1);z-index:50;}
-#info-panel.on{transform:translateY(0);}
-#info-cat{font-size:0.6rem;color:#999;text-transform:uppercase;letter-spacing:0.3em;margin-bottom:0.4em;}
-#info-panel h2{font-size:clamp(1rem,2vw,1.4rem);color:#111;font-weight:400;letter-spacing:0.06em;margin-bottom:0.4em;}
-#info-formula{font-family:'Courier New',monospace;font-size:clamp(0.75rem,1.1vw,0.9rem);color:#222;margin:0.6em 0;background:rgba(0,0,0,0.04);padding:6px 14px;display:inline-block;border-left:2px solid #ccc;}
-#info-text{font-size:clamp(0.75rem,1vw,0.88rem);color:#444;max-width:680px;line-height:1.8;}
-#info-hint{font-size:0.6rem;color:#bbb;margin-top:0.8em;letter-spacing:0.15em;text-transform:uppercase;}
-#notif{position:fixed;top:38%;left:50%;transform:translateX(-50%);font-size:0.65rem;color:rgba(255,255,255,0.55);letter-spacing:0.4em;text-transform:uppercase;pointer-events:none;z-index:60;opacity:0;transition:opacity 0.6s;text-align:center;white-space:nowrap;}
-#notif.on{opacity:1;}
-#joy-zone{position:fixed;bottom:0;left:0;width:50%;height:45%;z-index:30;display:none;touch-action:none;}
-#joy-base{position:absolute;bottom:32px;left:36px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);}
-#joy-stick{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.25);}
-#look-zone{position:fixed;bottom:0;right:0;width:50%;height:55%;z-index:30;display:none;touch-action:none;}
-.mobile #joy-zone,.mobile #look-zone{display:block;}
-.mobile #crosshair{display:none;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSEU DO CONHECIMENTO MATEMÁTICO</title>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; width: 100%; height: 100%; background: #ffffff; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; }
+
+        #bloqueio {
+            position: absolute; width: 100%; height: 100%; background: #ffffff;
+            color: #000000; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; z-index: 10; cursor: pointer;
+            border: 20px solid #000; box-sizing: border-box;
+        }
+        #bloqueio h1 { font-size: 2rem; letter-spacing: 6px; margin-bottom: 20px; text-transform: uppercase; }
+        #bloqueio .sub { font-size: 12px; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
+        #bloqueio p { font-size: 14px; font-weight: bold; color: #ff0055; }
+        #bloqueio .aviso { font-size: 11px; color: #aaa; margin-top: 20px; font-style: italic; }
+
+        #hud {
+            position: absolute; top: 30px; left: 30px; color: #000;
+            font-size: 13px; font-weight: bold; pointer-events: none; z-index: 5;
+            letter-spacing: 2px; line-height: 1.8;
+        }
+        #hud #dist-caos { color: #000; }
+
+        #painel-info {
+            position: absolute; bottom: 40px; right: 40px;
+            background: #000000; color: #ffffff; padding: 25px;
+            font-size: 14px; display: none; z-index: 5;
+            max-width: 450px; border-left: 8px solid #ff0055;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #painel-info .cat { font-size: 10px; color: #ff0055; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+        #painel-info h2 { margin: 0 0 8px 0; font-size: 17px; letter-spacing: 2px; color: #ffffff; }
+        #painel-info .formula { font-family: 'Courier New', monospace; font-size: 13px; color: #ffcc00; background: #111; padding: 8px 12px; margin: 10px 0; display: inline-block; border-left: 3px solid #ffcc00; width: 100%; box-sizing: border-box; }
+        #painel-info p { font-size: 12px; color: #bbb; line-height: 1.8; margin: 0; text-align: justify; }
+
+        #efeito-perigo {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            box-shadow: inset 0 0 100px rgba(255, 0, 85, 0);
+            pointer-events: none; z-index: 4; transition: box-shadow 0.1s ease;
+        }
+    </style>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
 </head>
 <body>
-<canvas id="canvas"></canvas>
-<div id="crosshair"></div>
-<div id="overlay">
-  <h1>Museu do Conhecimento Matematico</h1>
-  <div class="sub">Uma instalacao artistica digital</div>
-  <p>Voce esta prestes a entrar em um museu dedicado as maiores ideias matematicas ja produzidas pela humanidade.</p>
-  <p>Cada artefato representa uma descoberta - um teorema, uma constante, um paradoxo - que transformou nossa compreensao do universo.</p>
-  <p class="warn">O Caos acompanha todo avanco do conhecimento. Quanto mais voce descobre, mais ele se aproxima.</p>
-  <button id="enter-btn">Entrar no Museu</button>
-  <div id="ctrl-hint">PC: WASD para mover · Mouse para olhar · Clique para capturar cursor<br>Mobile: Joystick esquerdo para mover · Arrastar direita para olhar</div>
+
+<div id="bloqueio">
+    <h1>Museu do Conhecimento Matemático</h1>
+    <div class="sub">Uma instalação artística digital</div>
+    <p>[ CLIQUE NA TELA PARA INICIAR ]</p>
+    <p style="margin-top:16px;font-size:12px;color:#888;">W A S D para mover &nbsp;|&nbsp; Mouse para olhar</p>
+    <div class="aviso">O Caos acompanha todo avanço do conhecimento.<br>Quanto mais você descobre, mais ele se aproxima.</div>
 </div>
+
+<div id="efeito-perigo"></div>
+
 <div id="hud">
-  <div id="hud-title">Museu do Conhecimento Matematico</div>
-  <div id="hud-disc">Descobertas: <span id="disc-count">0</span> / 15</div>
+    MUSEU DO CONHECIMENTO MATEMÁTICO<br>
+    DISTÂNCIA DO CAOS: <span id="dist-caos">PROCURANDO...</span><br>
+    DESCOBERTAS: <span id="contador">0 / 15</span>
 </div>
-<div id="entropy">
-  <div id="entropy-label">Entropia</div>
-  <div id="entropy-bar"><div id="entropy-fill"></div></div>
+
+<div id="painel-info">
+    <div class="cat" id="info-cat"></div>
+    <h2 id="info-titulo"></h2>
+    <div class="formula" id="info-formula" style="display:none"></div>
+    <p id="info-desc"></p>
 </div>
-<div id="info-panel">
-  <div id="info-cat"></div>
-  <h2 id="info-title"></h2>
-  <div id="info-formula" style="display:none"></div>
-  <p id="info-text"></p>
-  <div id="info-hint">Aproxime-se para contemplar</div>
-</div>
-<div id="notif"></div>
-<div id="joy-zone"><div id="joy-base"><div id="joy-stick"></div></div></div>
-<div id="look-zone"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-const ARTWORKS=[
-  {id:'pi',cat:'Constante Fundamental',title:'O Numero π',formula:'C = 2πr',text:'π conecta circulos, ondas e o proprio universo. Presente em fisica, estatistica e geometria, esta constante irracional transborda de todo calculo onde a curvatura existe.',color:0x7ec8e3},
-  {id:'ramanujan',cat:'Serie Infinita',title:'Aproximacao de Ramanujan para π',formula:'1/π = (2√2/9801) Σ (4k)!(1103+26390k) / (k!)⁴ · 396⁴ᵏ',text:'Ramanujan descobriu series que calculam π com precisao extraordinaria. Sem formacao formal avancada, produziu formulas que parecem impossiveis.',color:0xffd700},
-  {id:'bernoulli',cat:'Numeros Especiais',title:'Numeros de Bernoulli',formula:'B₀=1, B₁=−½, B₂=⅙, B₄=−1/30…',text:'Eles aparecem onde ninguem espera: em series de potencias, teoria dos numeros, analise de funcoes. Bernoulli os descobriu investigando somas de potencias.',color:0xb8f5b8},
-  {id:'faulhaber',cat:'Somas de Potencias',title:'Formula de Faulhaber',formula:'1ᵏ + 2ᵏ + … + nᵏ = polinomio de grau k+1',text:'Faulhaber transformou somas gigantes em formulas elegantes. Os numeros de Bernoulli sao seus coeficientes secretos.',color:0xe8c5ff},
-  {id:'pitagoras',cat:'Geometria',title:'Teorema de Pitagoras',formula:'a² + b² = c²',text:'A distancia tornou-se numero. Ha 2500 anos, esta relacao revelou que a geometria obedece a algebra — e que o espaco possui estrutura mensuravel.',color:0xffa07a},
-  {id:'euler_e',cat:'Constante Fundamental',title:'O Numero e',formula:'e = lim(1 + 1/n)ⁿ = 2,71828…',text:'Base do logaritmo natural, e representa o crescimento continuo. Esta na origem do calculo, da probabilidade e das equacoes diferenciais que descrevem o universo.',color:0x90ee90},
-  {id:'euler_id',cat:'Equacao',title:'Identidade de Euler',formula:'eⁱᵖ + 1 = 0',text:'Considerada por muitos a equacao mais bela da matematica. Reune as cinco constantes fundamentais — e, i, π, 1 e 0 — numa unica e perfeita harmonia.',color:0xdde0ff},
-  {id:'quatro_cores',cat:'Teoria dos Grafos',title:'Teorema das Quatro Cores',formula:'χ(G) ≤ 4 para todo grafo planar G',text:'Todo mapa plano pode ser colorido com apenas quatro cores, sem que regioes vizinhas compartilhem a mesma. Levou mais de um seculo para ser provado.',color:0xff6b6b},
-  {id:'cantor',cat:'Teoria dos Conjuntos',title:'Conjunto de Cantor',formula:'C = [0,1] \\ ∪ intervalos removidos',text:'Remova o terco central de um segmento. Repita infinitamente. O que resta tem medida zero, mas contem tantos pontos quanto o segmento original. Infinitos no vazio.',color:0xadd8e6},
-  {id:'riemann',cat:'Hipotese nao Resolvida',title:'Hipotese de Riemann',formula:'ζ(s) = 0  ⟹  Re(s) = ½ ?',text:'Talvez o maior misterio da matematica. Se verdadeira, revela a estrutura profunda da distribuicao dos numeros primos. Permanece sem demonstracao desde 1859.',color:0x334488},
-  {id:'pascal',cat:'Combinatoria',title:'Triangulo de Pascal',formula:'C(n,k) = C(n−1,k−1) + C(n−1,k)',text:'Uma estrutura simples contendo infinitos padroes. Os coeficientes binomiais, Fibonacci, o Triangulo de Sierpinski — tudo emerge desta piramide numerica.',color:0xffeaa7},
-  {id:'fibonacci',cat:'Sequencia',title:'Sequencia de Fibonacci',formula:'Fₙ = Fₙ₋₁ + Fₙ₋₂,  F₀=0, F₁=1',text:'O crescimento transformado em forma. Aparece em conchas, petalas de flores, galaxias espirais. A razao entre termos consecutivos converge para φ, a Proporcao Aurea.',color:0x98d8c8},
-  {id:'koenigsberg',cat:'Teoria dos Grafos',title:'Pontes de Konigsberg',formula:'Euler, 1736',text:'Existe um caminho que cruza cada uma das sete pontes exatamente uma vez? Euler provou que nao — e ao faze-lo, fundou a teoria dos grafos e a topologia.',color:0xc0c0c0},
-  {id:'godel',cat:'Logica Matematica',title:'Incompletude de Godel',formula:'∀F consistente ∃φ: F⊬φ e F⊬¬φ',text:'Nem toda verdade pode ser demonstrada. Godel provou que qualquer sistema formal suficientemente poderoso contem verdades que nao podem ser provadas dentro dele.',color:0x22224a},
-  {id:'hilbert',cat:'Infinito',title:'Hotel de Hilbert',formula:'ℵ₀ + 1 = ℵ₀',text:'Um hotel com infinitos quartos, todos ocupados. Chega um novo hospede. Mova cada hospede do quarto n para n+1. O infinito e mais estranho do que imaginamos.',color:0x8888cc},
+
+<script type="module">
+import * as THREE from 'three';
+
+// --- MAPA ---
+const TAM = 6;
+const mapa = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,1,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1],
+    [1,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1],
+    [1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1],
+    [1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
+    [1,1,1,0,1,0,1,0,1,1,1,1,1,0,1,1,1,0,1,0,1,1,1],
+    [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,1],
+    [1,1,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,1],
+    [1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1],
+    [1,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
+    [1,0,1,0,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1],
+    [1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1],
+    [1,0,1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
+    [1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+];
+const LINHAS = mapa.length, COLUNAS = mapa[0].length;
+
+// --- DADOS DOS ARTEFATOS MATEMÁTICOS (TEXTOS EXPANDIDOS) ---
+const ARTEFATOS = [
+    {id:'pi',        cat:'Constante Fundamental',  titulo:'O Número Pi',              formula:'pi = C / d  =>  C = 2 * pi * r',                               cor:0x7ec8e3, texto:'Pi representa a razão imutável entre o perímetro de qualquer círculo e seu diâmetro. É um número irracional e transcendente, cujas casas decimais se estendem ao infinito sem padrões repetitivos. Desde a antiguidade babilônica até supercomputadores quânticos, Pi surge onde há rotação, oscilação ou curvatura estrutural. Sem ele, equações fundamentais da mecânica quântica (como o Princípio da Incerteza de Heisenberg) e da relatividade geral não existiriam.'},
+    {id:'euler_id',  cat:'Equação Máxima',         titulo:'Identidade de Euler',       formula:'e^(i * pi) + 1 = 0',                       cor:0xdde0ff, texto:'Aclamada como o ápice da elegância matemática, esta identidade entrelaça os cinco pilares conceituais mais fundamentais do universo num único plano conceitual: "e" (crescimento), "i" (dimensão imaginária), "pi" (geometria espacial), "1" (unidade aritmética elementar) e "0" (o vazio absoluto). Ela é uma consequência natural da análise complexa e demonstra como mundos aparentemente desconexos — trigonometria estrutural e exponenciação contínua — se unem perfeitamente.'},
+    {id:'pitagoras', cat:'Geometria Euclidiana',   titulo:'Teorema de Pitágoras',      formula:'a² + b² = c²',                        cor:0xffa07a, texto:'O alicerce geométrico do espaço bidimensional. Estabelece que, em qualquer triângulo retângulo, a área do quadrado construído sobre a hipotenusa é exatamente igual à soma das áreas dos quadrados construídos sobre os catetos. Mais do que medir triângulos, este teorema define o conceito de "métrica" e distância euclidiana, servindo como o ancestral direto para vetores, trigonometria analítica e o cálculo de coordenadas espaciais usados hoje em motores gráficos 3D e navegação global por satélite.'},
+    {id:'fibonacci', cat:'Sequência Natural',      titulo:'Sequência de Fibonacci',    formula:'F(n) = F(n-1) + F(n-2)  com  F(0)=0, F(1)=1',                       cor:0x98d8c8, texto:'Uma recorrência numérica simples onde cada termo é gerado pela soma de seus dois predecessores diretos. O aspecto mais profundo desta sequência é que a divisão de um termo pelo seu anterior converge progressivamente para o número irracional Phi (1.618), conhecido como a Proporção Áurea. Esta razão dita padrões de eficiência geométrica na natureza, surgindo na filotaxia das plantas, na rotação de furacões e na arquitetura espiralada de galáxias inteiras.'},
+    {id:'euler_e',   cat:'Constante Fundamental',  titulo:'O Número e (Constante de Napier)', formula:'e = lim (1 + 1/n)^n  =  2.71828...',          cor:0x90ee90, texto:'O número "e" é a base dos logaritmos naturais e a única base cujo gráfico da função f(x) = e^x possui uma derivada (taxa de variação instantânea) idêntica ao valor da própria função. Por conta dessa propriedade, ele funciona como a constante matemática universal para descrever qualquer sistema de crescimento contínuo ou decaimento orgânico, desde os juros compostos das finanças, passando pela propagação de epidemias, até o decaimento radioativo de elementos atômicos.'},
+    {id:'riemann',   cat:'Enigma Não Resolvido',   titulo:'Hipótese de Riemann',       formula:'zeta(s) = 0  =>  Re(s) = 1/2',              cor:0x6688cc, texto:'O maior enigma aberto da matemática pura, listado como um dos Problemas do Milênio. Formulada por Bernhard Riemann em 1859, a hipótese afirma que todos os zeros não triviais da Função Zeta de Riemann possuem uma parte real exatamente igual a 1/2. Caso provada verdadeira, ela trará uma compreensão absoluta sobre a distribuição misteriosa dos números primos ao longo da reta numérica, que hoje servem como a base algorítmica de segurança para toda a criptografia digital contemporânea.'},
+    {id:'cantor',    cat:'Teoria dos Conjuntos',   titulo:'Conjunto de Cantor',        formula:'C = Interseção de n=0 a inf [C_n]',    cor:0xadd8e6, texto:'Criado por Georg Cantor, este fractal é construído pegando um intervalo fechado [0, 1], removendo seu terço central aberto e repetindo este processo infinitamente com os segmentos restantes. O resultado é um objeto matemático paradoxal: possui comprimento geométrico total igual a zero (medida nula), mas simultaneamente abriga uma infinidade não enumerável de pontos isolados, contendo a mesma cardinalidade (tamanho de infinito) que a reta numérica inteira.'},
+    {id:'pascal',    cat:'Combinatória',           titulo:'Triângulo de Pascal',       formula:'C(n, k) = n! / (k! * (n - k)!)',        cor:0xffeaa7, texto:'Um arranjo infinito triangular composto por coeficientes binomiais, onde cada número é a soma direta dos dois imediatamente acima dele. Esta estrutura aparentemente rudimentar esconde profundas conexões transversais: as somas de suas linhas formam potências de base 2, suas diagonais formam números triangulares e tetraédricos, e a filtragem de seus números ímpares revela visualmente o Fractal do Triângulo de Sierpinski.'},
+    {id:'godel',     cat:'Lógica Matemática',      titulo:'Incompletude de Gödel',      formula:'Se F é consistente, existe phi tal que F +/-/ não prova phi', cor:0x9999dd, texto:'Em 1931, Kurt Gödel abalou as fundações da ciência ao provar que em qualquer sistema matemático axiomático formal e consistente que seja forte o suficiente para conter a aritmética básica, existem proposições verdadeiras que jamais poderão ser provadas ou refutadas utilizando os próprios axiomas do sistema. Isso significa que a verdade matemática é intrinsecamente mais ampla do que a nossa capacidade lógica humana de produzir demonstrações formais.'},
+    {id:'hilbert',   cat:'Paradoxo do Infinito',   titulo:'Hotel de Hilbert',          formula:'aleph_0 + n = aleph_0',                   cor:0x8888cc, texto:'Um experimento mental idealizado por David Hilbert para ilustrar as propriedades contra-intuitivas de conjuntos infinitos. Imagine um hotel com infinitos quartos e todos completamente ocupados. Se um novo hóspede chega, o gerente simplesmente move o hóspede do quarto "n" para o quarto "n+1", desocupando o quarto 1. O paradoxo demonstra que o infinito real não se comporta como quantidades finitas, obedecendo à aritmética transfinitas de Cantor.'},
+    {id:'bernoulli', cat:'Números Especiais',      titulo:'Números de Bernoulli',      formula:'x / (e^x - 1) = Soma (n=0 a inf) (B_n * x^n / n!)',              cor:0xb8f5b8, texto:'Descobertos de forma independente por Jacob Bernoulli, estes números racionais altamente peculiares surgem nos coeficientes de expansões em séries de potências e nas somas de potências de números inteiros. Eles possuem conexões profundas com os valores da Função Zeta de Riemann para inteiros negativos e desempenham um papel crítico na teoria das cordas, topologia diferencial moderna e no estudo de formas modulares avançadas.'},
+    {id:'faulhaber', cat:'Álgebra e Somas',        titulo:'Fórmula de Faulhaber',      formula:'Soma (k=1 a n) k^p = 1/(p+1) * Soma (j=0 a p) (-1)^j * C(p+1, j) * B_j * n^(p+1-j)',       cor:0xe8c5ff, texto:'A fórmula de Faulhaber resolve de forma genérica e elegante um problema que intrigou matemáticos por séculos: expressar a soma das potências de ordem "p" dos primeiros "n" números inteiros positivos como um polinômio puramente algébrico de grau "p+1". O segredo definitivo desta fórmula reside no uso dos Números de Bernoulli como coeficientes multiplicadores, revelando uma ordem simétrica por trás das progressões.'},
+    {id:'4cores',    cat:'Teoria dos Grafos',      titulo:'Teorema das Quatro Cores',  formula:'Grafos Planares: chi(G) <= 4',        cor:0xff9999, texto:'Este teorema dita que qualquer mapa geográfico plano (ou bidimensional) dividido em regiões contíguas pode ser colorido inteiramente utilizando no máximo quatro cores distintas, sem que duas regiões fronteiriças compartilhem a mesma cor. Foi o primeiro grande teorema matemático da história humana a ser demonstrado com o auxílio massivo de computadores em 1976, já que exigiu a análise mecânica exaustiva de 1.476 configurações possíveis.'},
+    {id:'konig',     cat:'Topologia Primitiva',    titulo:'Pontes de Königsberg',      formula:'Grafo Euleriano <=> Grau de todo vértice é par',                            cor:0xc0c0c0, texto:'Em 1736, a cidade de Königsberg possuía sete pontes cruzando o rio Prególia. O enigma popular questionava se era possível caminhar pela cidade cruzando cada ponte exatamente uma única vez. Leonhard Euler modelou o espaço abstratamente substituindo massas de terra por vértices e pontes por arestas. Ao provar rigorosamente que o trajeto era impossível por conta do número ímpar de conexões, ele inaugurou a Teoria dos Grafos e a Topologia.'},
+    {id:'ramanujan', cat:'Séries Infinitas',       formula:'1 / pi = (2 * sqrt(2) / 9801) * Soma (n=0 a inf) ((4n)! * (1103 + 26390n)) / ((n!)^4 * 396^(4n))',      cor:0xffd700, texto:'Srinivasa Ramanujan, operando quase sem treinamento acadêmico formal formalizado na Índia, intuiu e deduziu milhares de identidades matemáticas incompreensivelmente complexas. Esta série infinita específica converge para o valor inverso de Pi com uma velocidade avassaladora de precisão, gerando cerca de 8 novas casas decimais exatas a cada termo somado. É a fórmula que serve de base conceitual para os algoritmos modernos de cálculo computacional de alta performance.'},
 ];
 
-const MAZE=[
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-  [1,0,1,1,0,1,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1],
-  [1,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,1],
-  [1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1],
-  [1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
-  [1,1,1,0,1,0,1,0,1,1,1,1,1,0,1,1,1,0,1,0,1,1,1],
-  [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-  [1,0,1,1,1,0,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,1],
-  [1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,1],
-  [1,1,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1],
-  [1,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,1],
-  [1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1],
-  [1,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
-  [1,0,1,0,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1],
-  [1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1],
-  [1,0,1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,0,1],
-  [1,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
-  [1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1],
-  [1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-];
-const ROWS=MAZE.length,COLS=MAZE[0].length,CELL=6,WH=4;
+// --- ENGINE ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+scene.fog = new THREE.FogExp2(0xffffff, 0.035);
 
-function wp(r,c){return new THREE.Vector3(c*CELL-(COLS*CELL/2)+CELL/2,0,r*CELL-(ROWS*CELL/2)+CELL/2);}
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
-function freeCells(){const a=[];for(let r=1;r<ROWS-1;r++)for(let c=1;c<COLS-1;c++)if(MAZE[r][c]===0)a.push([r,c]);return a;}
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+camera.position.set(TAM, 1.6, (LINHAS-2)*TAM);
 
-// --- RENDERER ---
-const canvas=document.getElementById('canvas');
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth,innerHeight);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
 
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0xf0f0ed);
-scene.fog=new THREE.FogExp2(0xf0f0ed,0.032);
-
-const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,0.1,200);
-const sp=wp(1,1);
-camera.position.set(sp.x,WH*0.45,sp.z);
-
-scene.add(new THREE.AmbientLight(0xffffff,0.75));
-scene.add(new THREE.HemisphereLight(0xffffff,0xdddddd,0.4));
-
-// --- MAZE BUILD ---
-const wGeo=new THREE.BoxGeometry(CELL,WH,CELL);
-const wMat=new THREE.MeshLambertMaterial({color:0xf8f8f8});
-for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(MAZE[r][c]===1){
-  const m=new THREE.Mesh(wGeo,wMat);const p=wp(r,c);m.position.set(p.x,WH/2,p.z);scene.add(m);
-}
-const pg=new THREE.PlaneGeometry(COLS*CELL,ROWS*CELL);
-const fl=new THREE.Mesh(pg,new THREE.MeshLambertMaterial({color:0xebebea}));
-fl.rotation.x=-Math.PI/2;scene.add(fl);
-const cl=new THREE.Mesh(pg,new THREE.MeshLambertMaterial({color:0xffffff}));
-cl.rotation.x=Math.PI/2;cl.position.y=WH;scene.add(cl);
-
-// --- ARTIFACTS ---
-function mkMat(col,ei=0.3,op=1){
-  return new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:ei,roughness:0.35,metalness:0.1,transparent:op<1,opacity:op});
-}
-function buildArt(aw,r,c){
-  const grp=new THREE.Group();const pos=wp(r,c);const col=aw.color;const mat=mkMat(col);
-  grp.position.set(pos.x,WH*0.5,pos.z);
-  switch(aw.id){
-    case'pi':for(let i=0;i<3;i++){const g=new THREE.TorusGeometry(0.42+i*0.23,0.05,8,48);const m=new THREE.Mesh(g,mat.clone());m.rotation.x=Math.PI/3*i;grp.add(m);}break;
-    case'ramanujan':{const g=new THREE.OctahedronGeometry(0.62,2);grp.add(new THREE.Mesh(g,mat.clone()));const wm=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:col,wireframe:true,transparent:true,opacity:0.22}));wm.scale.setScalar(1.15);grp.add(wm);}break;
-    case'bernoulli':for(let i=0;i<4;i++){const g=new THREE.SphereGeometry(0.26+i*0.13,14,14);grp.add(new THREE.Mesh(g,mkMat(col,0.3-i*0.05,0.65-i*0.1)));}break;
-    case'faulhaber':for(let i=0;i<5;i++){const g=new THREE.BoxGeometry(0.26,0.11,0.26*(i+1));const m=new THREE.Mesh(g,mat.clone());m.position.set(0,i*0.17-0.43,0);grp.add(m);}break;
-    case'pitagoras':{[[0.42,0,0],[-0.32,0,0],[0.05,0,0.46]].forEach(([x,y,z],i)=>{const s=[0.48,0.34,0.34][i];const g=new THREE.BoxGeometry(s,0.05,s);const m=new THREE.Mesh(g,mat.clone());m.position.set(x,y,z);grp.add(m);});}break;
-    case'euler_e':{const pts=[];for(let t=0;t<Math.PI*4;t+=0.05){const r2=0.04*Math.exp(t*0.12);pts.push(new THREE.Vector3(r2*Math.cos(t),t*0.1-0.6,r2*Math.sin(t)));}grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),100,0.03,6),mat.clone()));}break;
-    case'euler_id':{const g=new THREE.IcosahedronGeometry(0.58,1);grp.add(new THREE.Mesh(g,mat.clone()));grp.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.63,1),new THREE.MeshBasicMaterial({color:col,wireframe:true,transparent:true,opacity:0.18})));}break;
-    case'quatro_cores':[0xff6b6b,0x4ecdc4,0xffe66d,0x6bcb77].forEach((c2,i)=>{const g=new THREE.CylinderGeometry(0.2,0.2,0.1,6);const m=new THREE.Mesh(g,mkMat(c2,0.3));m.position.set(Math.cos(i*Math.PI/2)*0.36,0,Math.sin(i*Math.PI/2)*0.36);grp.add(m);});break;
-    case'cantor':{function cL(x,y,w,lv){if(lv===0)return;const m=new THREE.Mesh(new THREE.BoxGeometry(w*0.88,0.05,0.07),mat.clone());m.position.set(x,y,0);grp.add(m);cL(x-w/3,y-0.21,w/3,lv-1);cL(x+w/3,y-0.21,w/3,lv-1);}cL(0,0.42,1.05,4);}break;
-    case'riemann':for(let i=0;i<7;i++){const h=0.3+Math.random()*0.72;const g=new THREE.CylinderGeometry(0.055,0.055,h,8);const m=new THREE.Mesh(g,mkMat(0x4466cc,0.55,0.75));m.position.set((i-3)*0.17,h/2-0.43,0);grp.add(m);}break;
-    case'pascal':for(let row=0;row<5;row++)for(let col2=0;col2<=row;col2++){const m=new THREE.Mesh(new THREE.SphereGeometry(0.062,8,8),mat.clone());m.position.set((col2-row/2)*0.27,(4-row)*0.21-0.33,0);grp.add(m);}break;
-    case'fibonacci':{const pts=[];let a=0,b=1;for(let t=0;t<Math.PI*6;t+=0.08){const r2=0.03*(a+b)*0.1;pts.push(new THREE.Vector3(r2*Math.cos(t),t*0.05-0.6,r2*Math.sin(t)));[a,b]=[b,a+b];}grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),120,0.025,6),mat.clone()));}break;
-    case'koenigsberg':[[-0.4,0,0.4,0],[-0.3,-0.3,0.3,0.3],[-0.3,0.3,0.3,-0.3],[0,-0.4,0,0.4],[0.4,-0.2,0.4,0.2],[-0.4,-0.2,-0.4,0.2],[0.2,0,-0.2,0]].forEach(([x1,z1,x2,z2])=>{const pts=[];for(let t=0;t<=1;t+=0.05)pts.push(new THREE.Vector3(x1+(x2-x1)*t,Math.sin(t*Math.PI)*0.24,z1+(z2-z1)*t));grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),20,0.023,4),mat.clone()));});break;
-    case'godel':grp.add(new THREE.Mesh(new THREE.BoxGeometry(0.68,0.68,0.68),mkMat(col,0.12,0.2)));const m2g=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.4),mat.clone());m2g.rotation.y=Math.PI/4;grp.add(m2g);const m3g=new THREE.Mesh(new THREE.BoxGeometry(0.21,0.21,0.21),new THREE.MeshBasicMaterial({color:col,wireframe:true}));m3g.rotation.x=Math.PI/4;grp.add(m3g);break;
-    case'hilbert':for(let i=0;i<8;i++){const s=0.21*Math.pow(0.78,i);const m=new THREE.Mesh(new THREE.SphereGeometry(s,8,8),mat.clone());m.position.set(0,0,-i*0.37);grp.add(m);}break;
-  }
-  const pl=new THREE.PointLight(col,1.2,CELL*2);grp.add(pl);
-  const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.17,0.68,12),new THREE.MeshLambertMaterial({color:0xe0e0e0}));
-  ped.position.y=-WH*0.5+0.34;grp.add(ped);
-  scene.add(grp);
-  return{grp,aw,pos:new THREE.Vector3(pos.x,WH*0.45,pos.z),found:false};
+// --- COLISÃO ---
+function colide(pos) {
+    const mg = 0.4;
+    const testa = (x, z) => {
+        const c = Math.floor((x + TAM/2) / TAM);
+        const r = Math.floor((z + TAM/2) / TAM);
+        if (r<0||r>=LINHAS||c<0||c>=COLUNAS) return true;
+        return mapa[r][c] === 1;
+    };
+    return testa(pos.x+mg,pos.z)||testa(pos.x-mg,pos.z)||testa(pos.x,pos.z+mg)||testa(pos.x,pos.z-mg);
 }
 
-const cells=shuffle(freeCells());
-// Skip cells near spawn
-const safeStart=cells.findIndex(([r,c])=>!(r<=2&&c<=2));
-if(safeStart>0)[cells[0],cells[safeStart]]=[cells[safeStart],cells[0]];
-const artifacts=ARTWORKS.map((aw,i)=>buildArt(aw,...cells[i]));
+// --- CONSTRUÇÃO DO MAPA ---
+const geoParede = new THREE.BoxGeometry(TAM, 4, TAM);
+const matBranco = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-// --- PARTICLES ---
-{const N=300,pos=new Float32Array(N*3);for(let i=0;i<N;i++){pos[i*3]=(Math.random()-0.5)*COLS*CELL;pos[i*3+1]=Math.random()*WH;pos[i*3+2]=(Math.random()-0.5)*ROWS*CELL;}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:0.05,transparent:true,opacity:0.3})));}
+for (let r=0; r<LINHAS; r++) {
+    for (let c=0; c<COLUNAS; c++) {
+        if (mapa[r][c] !== 1) continue;
+        const bloco = new THREE.Mesh(geoParede, matBranco);
+        bloco.position.set(c*TAM, 2, r*TAM);
+        scene.add(bloco);
+        const edges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(geoParede),
+            new THREE.LineBasicMaterial({ color: 0x000000 })
+        );
+        edges.position.copy(bloco.position);
+        scene.add(edges);
+    }
+}
+
+// Chão e teto
+const planeGeo = new THREE.PlaneGeometry(1000, 1000);
+const chao = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({ color: 0xfafafa }));
+chao.rotation.x = -Math.PI/2; scene.add(chao);
+const teto = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({ color: 0xfafafa }));
+teto.rotation.x = Math.PI/2; teto.position.y = 4; scene.add(teto);
+const grid = new THREE.GridHelper(1000, 250, 0xdddddd, 0xf0f0f0);
+grid.position.y = 0.01; scene.add(grid);
+
+// --- POSIÇÕES LIVRES ---
+function shuffle(arr) {
+    for (let i=arr.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[arr[i],arr[j]]=[arr[j],arr[i]];}
+    return arr;
+}
+const celulasLivres = [];
+for (let r=1;r<LINHAS-1;r++) for (let c=1;c<COLUNAS-1;c++) {
+    if (!(r>=LINHAS-3 && c<=2) && mapa[r][c] === 0) celulasLivres.push([r,c]);
+}
+shuffle(celulasLivres);
+
+// --- CRIAÇÃO DOS ARTEFATOS 3D ---
+function criarArtefato(id, cor) {
+    const grp = new THREE.Group();
+    const mat = new THREE.MeshBasicMaterial({ color: cor });
+    const matWire = new THREE.MeshBasicMaterial({ color: cor, wireframe: true });
+
+    switch(id) {
+        case 'pi': {
+            const circulo = new THREE.Mesh(new THREE.TorusGeometry(0.45, 0.02, 16, 100), mat);
+            circulo.rotation.x = Math.PI / 2;
+            const diametro = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.9, 8), mat);
+            diametro.rotation.z = Math.PI / 2;
+            grp.add(circulo, diametro);
+            break;
+        }
+        case 'euler_id': {
+            const circuloComplexo = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.01, 8, 64), matWire);
+            circuloComplexo.rotation.x = Math.PI / 2;
+            const eixoX = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.9, 8), matWire);
+            eixoX.rotation.z = Math.PI / 2;
+            const vetor = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.001, 0.4, 8), mat);
+            vetor.rotation.z = Math.PI / 2;
+            vetor.position.x = -0.2; 
+            grp.add(circuloComplexo, eixoX, vetor);
+            break;
+        }
+        case 'pitagoras': {
+            const triangulo = new THREE.Group();
+            const qA = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.05), mat);
+            qA.position.set(-0.125, 0.125, 0);
+            const qB = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.05), mat);
+            qB.position.set(0.175, -0.175, 0);
+            const h = Math.sqrt(0.25*0.25 + 0.35*0.35);
+            const qC = new THREE.Mesh(new THREE.BoxGeometry(h, h, 0.05), matWire);
+            qC.rotation.z = Math.atan2(0.25, 0.35);
+            qC.position.set(0.175, 0.125, 0);
+            triangulo.add(qA, qB, qC);
+            triangulo.rotation.x = Math.PI / 4;
+            grp.add(triangulo);
+            break;
+        }
+        case 'fibonacci': {
+            const pts = [];
+            for (let i = 0; i < 80; i++) {
+                const t = i / 10;
+                const r = 0.03 * Math.pow(1.14, i);
+                pts.push(new THREE.Vector3(r * Math.cos(t), r * Math.sin(t), 0));
+            }
+            const curva = new THREE.CatmullRomCurve3(pts);
+            const espiral = new THREE.Mesh(new THREE.TubeGeometry(curva, 100, 0.015, 8), mat);
+            grp.add(espiral);
+            break;
+        }
+        case 'euler_e': {
+            const pts = [];
+            for (let x = -5; x <= 5; x++) {
+                const t = x / 5;
+                pts.push(new THREE.Vector3(t * 0.5, Math.exp(t) * 0.15 - 0.2, 0));
+            }
+            const curva = new THREE.CatmullRomCurve3(pts);
+            const grafico = new THREE.Mesh(new THREE.TubeGeometry(curva, 40, 0.015, 8), mat);
+            const eixoX = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 1.2, 8), matWire);
+            eixoX.rotation.z = Math.PI / 2;
+            eixoX.position.y = -0.2;
+            grp.add(grafico, eixoX);
+            break;
+        }
+        case 'riemann': {
+            const linhaCritica = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.0, 8), mat);
+            const ondaGeo = new THREE.PlaneGeometry(0.6, 0.8, 10, 10);
+            const pos = ondaGeo.attributes.position;
+            for(let i=0; i<pos.count; i++) {
+                let z = Math.sin(pos.getY(i) * 10) * 0.1;
+                pos.setZ(i, z);
+            }
+            ondaGeo.computeVertexNormals();
+            const onda = new THREE.Mesh(ondaGeo, matWire);
+            grp.add(linhaCritica, onda);
+            break;
+        }
+        case 'cantor': {
+            for (let i = 0; i < 4; i++) {
+                const y = 0.3 - (i * 0.2);
+                const segmentos = Math.pow(3, i);
+                const tamSeg = 1.0 / segmentos;
+                for (let j = 0; j < segmentos; j++) {
+                    let mostrar = true;
+                    let tempJ = j;
+                    for (let k = 0; k < i; k++) {
+                        if (tempJ % 3 === 1) { mostrar = false; break; }
+                        tempJ = Math.floor(tempJ / 3);
+                    }
+                    if (mostrar) {
+                        const m = new THREE.Mesh(new THREE.BoxGeometry(tamSeg * 0.9, 0.03, 0.05), mat);
+                        m.position.set((j * tamSeg) - 0.5 + (tamSeg/2), y, 0);
+                        grp.add(m);
+                    }
+                }
+            }
+            break;
+        }
+        case 'pascal': {
+            for(let r=0; r<5; r++) {
+                for(let c=0; c<=r; c++) {
+                    const esferinha = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 12), mat);
+                    esferinha.position.set((c - r/2) * 0.2, 0.4 - (r * 0.18), 0);
+                    grp.add(esferinha);
+                }
+            }
+            break;
+        }
+        case 'godel': {
+            const caixa1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matWire);
+            const caixa2 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+            caixa2.rotation.x = Math.PI / 4;
+            caixa2.rotation.y = Math.PI / 4;
+            grp.add(caixa1, caixa2);
+            break;
+        }
+        case 'hilbert': {
+            const ptsH = [
+                new THREE.Vector3(-0.2,-0.2,-0.2), new THREE.Vector3(-0.2,0.2,-0.2), new THREE.Vector3(0.2,0.2,-0.2), new THREE.Vector3(0.2,-0.2,-0.2),
+                new THREE.Vector3(0.2,-0.2,0.2), new THREE.Vector3(0.2,0.2,0.2), new THREE.Vector3(-0.2,0.2,0.2), new THREE.Vector3(-0.2,-0.2,0.2)
+            ];
+            const curvaH = new THREE.CatmullRomCurve3(ptsH);
+            const hotel = new THREE.Mesh(new THREE.TubeGeometry(curvaH, 64, 0.02, 6, false), mat);
+            grp.add(hotel);
+            break;
+        }
+        case 'bernoulli': {
+            const ptsB = [];
+            for(let i=0; i<100; i++) {
+                const t = (i / 100) * Math.PI * 2;
+                const denom = 1 + Math.sin(t)*Math.sin(t);
+                const x = (0.5 * Math.cos(t)) / denom;
+                const y = (0.5 * Math.sin(t) * Math.cos(t)) / denom;
+                ptsB.push(new THREE.Vector3(x, y, 0));
+            }
+            const curvaB = new THREE.CatmullRomCurve3(ptsB);
+            const lemniscata = new THREE.Mesh(new THREE.TubeGeometry(curvaB, 100, 0.018, 8, true), mat);
+            grp.add(lemniscata);
+            break;
+        }
+        case 'faulhaber': {
+            for(let i=1; i<=4; i++) {
+                const tamanho = i * 0.15;
+                const degrau = new THREE.Mesh(new THREE.BoxGeometry(tamanho, 0.08, tamanho), matWire);
+                degrau.position.y = -0.3 + (i * 0.09);
+                grp.add(degrau);
+            }
+            break;
+        }
+        case '4cores': {
+            const cores = [0xff4444, 0x44cccc, 0xffdd44, 0x44cc66];
+            for(let i=0; i<4; i++) {
+                const gRegion = new THREE.SphereGeometry(0.35, 16, 16, (i * Math.PI)/2, Math.PI/2);
+                const mRegion = new THREE.Mesh(gRegion, new THREE.MeshBasicMaterial({color: cores[i]}));
+                grp.add(mRegion);
+            }
+            break;
+        }
+        case 'konig': {
+            const noA = new THREE.Vector3(-0.4, 0, 0), noB = new THREE.Vector3(0.4, 0, 0);
+            const noC = new THREE.Vector3(0, 0.4, 0), noD = new THREE.Vector3(0, -0.4, 0);
+            [noA, noB, noC, noD].forEach(p => {
+                const no = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), mat);
+                no.position.copy(p); grp.add(no);
+            });
+            const criarPonte = (p1, p2, curvaY) => {
+                const ptsP = [];
+                for(let t=0; t<=1; t+=0.2) {
+                    let p = new THREE.Vector3().lerpVectors(p1, p2, t);
+                    p.y += Math.sin(t * Math.PI) * curvaY;
+                    ptsP.push(p);
+                }
+                grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ptsP), 10, 0.015, 4), matWire));
+            };
+            criarPonte(noA, noC, 0.1); criarPonte(noA, noC, -0.1);
+            criarPonte(noB, noC, 0.1); criarPonte(noB, noC, -0.1);
+            criarPonte(noA, noD, 0.1); criarPonte(noB, noD, 0.1);
+            criarPonte(noA, noB, 0.2);
+            break;
+        }
+        case 'ramanujan': {
+            const gBase = new THREE.IcosahedronGeometry(0.35, 0);
+            const mBase = new THREE.Mesh(gBase, matWire);
+            const gInterno = new THREE.OctahedronGeometry(0.2, 0);
+            const mInterno = new THREE.Mesh(gInterno, mat);
+            grp.add(mBase, mInterno);
+            break;
+        }
+        default:
+            grp.add(new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), mat.clone()));
+    }
+    return grp;
+}
+
+// Coloca os artefatos no mundo
+const artefatos3D = [];
+ARTEFATOS.forEach((art, i) => {
+    const [r, c] = celulasLivres[i];
+    const grp = criarArtefato(art.id, art.cor);
+
+    // Pedestal
+    const ped = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12,0.18,1.0,10),
+        new THREE.MeshBasicMaterial({ color: 0x222222 })
+    );
+    ped.position.y = -0.5;
+    grp.add(ped);
+
+    // Luz pontual colorida
+    const luz = new THREE.PointLight(art.cor, 1.5, TAM*2);
+    grp.add(luz);
+
+    grp.position.set(c*TAM, 1.5, r*TAM);
+    scene.add(grp);
+    artefatos3D.push({ grp, art, descoberto: false });
+});
 
 // --- O CAOS ---
-const chaosGrp=new THREE.Group();
-chaosGrp.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.5,2),new THREE.MeshStandardMaterial({color:0x080808,emissive:0x330000,emissiveIntensity:1,roughness:0.1,metalness:0.6,transparent:true,opacity:0.88})));
-const chaosAura=new THREE.Mesh(new THREE.SphereGeometry(1,12,12),new THREE.MeshBasicMaterial({color:0x660000,transparent:true,opacity:0.06}));
-chaosGrp.add(chaosAura);
-const chaosLight=new THREE.PointLight(0xff1111,0,CELL*3);
-chaosGrp.add(chaosLight);
-const csp=wp(ROWS-2,COLS-2);
-chaosGrp.position.set(csp.x,WH*0.45,csp.z);
-scene.add(chaosGrp);
-let chaosTarget=new THREE.Vector3(),chaosTimer=0,chaosSpeed=0.012;
+const caosGrp = new THREE.Group();
+const caosCorpo = new THREE.Mesh(new THREE.OctahedronGeometry(0.8,0), new THREE.MeshBasicMaterial({color:0x111111,wireframe:true}));
+caosGrp.add(caosCorpo);
+const caosNucleo = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshBasicMaterial({color:0xff0033}));
+caosGrp.add(caosNucleo);
+const caosLuz = new THREE.PointLight(0xff0033, 0, TAM*3);
+caosGrp.add(caosLuz);
 
-function updateChaos(dt,ppos,disc){
-  chaosSpeed=0.012+disc*0.0028;
-  chaosLight.intensity=Math.min(2,disc*0.14);
-  chaosTimer-=dt;
-  if(chaosTimer<=0){chaosTarget.copy(ppos);chaosTimer=0.7+Math.random()*0.5;}
-  const dir=chaosTarget.clone().sub(chaosGrp.position);dir.y=0;
-  if(dir.length()>0.1){
-    dir.normalize().multiplyScalar(chaosSpeed*dt*60);
-    const next=chaosGrp.position.clone().add(dir);
-    const cc=Math.floor((next.x+COLS*CELL/2)/CELL);
-    const rr=Math.floor((next.z+ROWS*CELL/2)/CELL);
-    if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS&&MAZE[rr][cc]!==1)chaosGrp.position.copy(next);
-  }
-  chaosGrp.rotation.x+=dt*0.9;chaosGrp.rotation.y+=dt*1.3;
-  chaosAura.scale.setScalar(1+Math.sin(Date.now()*0.003)*0.18);
-}
+caosGrp.position.set((COLUNAS-2)*TAM, 1.2, TAM);
+scene.add(caosGrp);
+let caosVelBase = 2.4;
 
-// --- CONTROLS ---
-let yaw=0,pitch=0;
-const keys={};
-let locked=false,started=false;
+// --- CONTROLES ---
+const bloqueio = document.getElementById('bloqueio');
+let mouseCapturado = false;
 
-document.addEventListener('keydown',e=>{keys[e.code]=true;});
-document.addEventListener('keyup',e=>{keys[e.code]=false;});
-canvas.addEventListener('click',()=>{if(started&&!isMobile)canvas.requestPointerLock();});
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;});
-document.addEventListener('mousemove',e=>{
-  if(!locked)return;
-  yaw-=e.movementX*0.002;pitch-=e.movementY*0.002;
-  pitch=Math.max(-Math.PI/2.4,Math.min(Math.PI/2.4,pitch));
+bloqueio.addEventListener('click', () => document.body.requestPointerLock());
+document.addEventListener('pointerlockchange', () => {
+    mouseCapturado = (document.pointerLockElement === document.body);
+    bloqueio.style.display = mouseCapturado ? 'none' : 'flex';
 });
 
-function canMove(nx,nz){
-  const mg=0.35;
-  for(const[x,z] of[[nx+mg,nz+mg],[nx-mg,nz+mg],[nx+mg,nz-mg],[nx-mg,nz-mg]]){
-    const c=Math.floor((x+COLS*CELL/2)/CELL);const r=Math.floor((z+ROWS*CELL/2)/CELL);
-    if(r<0||r>=ROWS||c<0||c>=COLS||MAZE[r][c]===1)return false;
-  }
-  return true;
-}
+let camRot = { x: 0, y: 0 };
+document.addEventListener('mousemove', (e) => {
+    if (!mouseCapturado) return;
+    camRot.y -= e.movementX * 0.0022;
+    camRot.x -= e.movementY * 0.0022;
+    camRot.x = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, camRot.x));
+});
 
-// --- MOBILE ---
-const isMobile=/Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent)||('ontouchstart'in window&&innerWidth<900);
-if(isMobile)document.body.classList.add('mobile');
-
-const joyBase=document.getElementById('joy-base');
-const joyStick=document.getElementById('joy-stick');
-const joyZone=document.getElementById('joy-zone');
-const lookZone=document.getElementById('look-zone');
-let joyId=null,joyOrig={x:0,y:0},joyDelta={x:0,y:0};
-let lookId=null,lookLast={x:0,y:0};
-
-joyZone.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];joyId=t.identifier;const r=joyBase.getBoundingClientRect();joyOrig={x:r.left+r.width/2,y:r.top+r.height/2};doJoy(t);},{passive:false});
-joyZone.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches)if(t.identifier===joyId)doJoy(t);},{passive:false});
-joyZone.addEventListener('touchend',e=>{e.preventDefault();for(const t of e.changedTouches)if(t.identifier===joyId){joyId=null;joyDelta={x:0,y:0};joyStick.style.transform='translate(-50%,-50%)';}},{passive:false});
-function doJoy(t){const dx=t.clientX-joyOrig.x,dy=t.clientY-joyOrig.y;const len=Math.sqrt(dx*dx+dy*dy),mx=36;const cx=len>mx?dx/len*mx:dx,cy=len>mx?dy/len*mx:dy;joyDelta={x:cx/mx,y:cy/mx};joyStick.style.transform=`translate(calc(-50% + ${cx}px),calc(-50% + ${cy}px))`;}
-lookZone.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];lookId=t.identifier;lookLast={x:t.clientX,y:t.clientY};},{passive:false});
-lookZone.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches){if(t.identifier!==lookId)continue;yaw-=(t.clientX-lookLast.x)*0.004;pitch-=(t.clientY-lookLast.y)*0.004;pitch=Math.max(-Math.PI/2.4,Math.min(Math.PI/2.4,pitch));lookLast={x:t.clientX,y:t.clientY};}},{passive:false});
-lookZone.addEventListener('touchend',e=>{e.preventDefault();for(const t of e.changedTouches)if(t.identifier===lookId)lookId=null;},{passive:false});
+const teclas = { w:false, a:false, s:false, d:false };
+window.addEventListener('keydown', e => { const t=e.key.toLowerCase(); if(t==='w')teclas.w=true;if(t==='s')teclas.s=true;if(t==='a')teclas.a=true;if(t==='d')teclas.d=true; });
+window.addEventListener('keyup',  e => { const t=e.key.toLowerCase(); if(t==='w')teclas.w=false;if(t==='s')teclas.s=false;if(t==='a')teclas.a=false;if(t==='d')teclas.d=false; });
 
 // --- UI ---
-const infoPanel=document.getElementById('info-panel');
-const discCount=document.getElementById('disc-count');
-const entFill=document.getElementById('entropy-fill');
-const notifEl=document.getElementById('notif');
-let discoveries=0,currentNear=null,notifTimer=null;
+const elDistCaos   = document.getElementById('dist-caos');
+const elContador   = document.getElementById('contador');
+const painelInfo   = document.getElementById('painel-info');
+const efeitoPerigo = document.getElementById('efeito-perigo');
+let totalDescobertas = 0;
 
-function notify(txt){notifEl.textContent=txt;notifEl.classList.add('on');clearTimeout(notifTimer);notifTimer=setTimeout(()=>notifEl.classList.remove('on'),2800);}
-function showInfo(aw){document.getElementById('info-cat').textContent=aw.cat;document.getElementById('info-title').textContent=aw.title;document.getElementById('info-text').textContent=aw.text;const f=document.getElementById('info-formula');if(aw.formula){f.textContent=aw.formula;f.style.display='block';}else f.style.display='none';infoPanel.classList.add('on');}
-function hideInfo(){infoPanel.classList.remove('on');}
-
-document.getElementById('enter-btn').addEventListener('click',()=>{
-  const ov=document.getElementById('overlay');
-  ov.style.opacity='0';
-  setTimeout(()=>{ov.style.display='none';started=true;if(!isMobile)canvas.requestPointerLock();},1200);
-});
-
-// --- LOOP ---
-const clock=new THREE.Clock();
-const DETECT=CELL*0.85;
-const fogBase=new THREE.Color(0xf0f0ed);
-const fogChaos=new THREE.Color(0xfde0e0);
-
-function animate(){
-  requestAnimationFrame(animate);
-  const dt=Math.min(clock.getDelta(),0.05);
-
-  // Always render — fixes white screen bug
-  if(!started){renderer.render(scene,camera);return;}
-
-  camera.quaternion.setFromEuler(new THREE.Euler(pitch,yaw,0,'YXZ'));
-
-  const spd=isMobile?4.5:5;
-  const fwd=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
-  const rgt=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
-  const mv=new THREE.Vector3();
-  if(keys['KeyW']||keys['ArrowUp'])mv.add(fwd);
-  if(keys['KeyS']||keys['ArrowDown'])mv.sub(fwd);
-  if(keys['KeyA']||keys['ArrowLeft'])mv.sub(rgt);
-  if(keys['KeyD']||keys['ArrowRight'])mv.add(rgt);
-  if(joyDelta.x!==0||joyDelta.y!==0){mv.add(fwd.clone().multiplyScalar(-joyDelta.y));mv.add(rgt.clone().multiplyScalar(joyDelta.x));}
-  if(mv.length()>0){
-    mv.normalize().multiplyScalar(spd*dt);
-    const nx=camera.position.x+mv.x,nz=camera.position.z+mv.z;
-    if(canMove(nx,camera.position.z))camera.position.x=nx;
-    if(canMove(camera.position.x,nz))camera.position.z=nz;
-  }
-
-  let near=null;
-  artifacts.forEach(art=>{
-    const d=camera.position.distanceTo(art.pos);
-    const spin=d<DETECT?0.5:0.12;
-    art.grp.children.forEach(ch=>{if(ch.isMesh)ch.rotation.y+=dt*spin;});
-    if(d<DETECT){
-      near=art;
-      if(!art.found){art.found=true;discoveries++;discCount.textContent=discoveries;entFill.style.width=(discoveries/15*100)+'%';notify('"'+art.aw.title+'" contemplado');}
-    }
-  });
-  if(near!==currentNear){currentNear=near;near?showInfo(near.aw):hideInfo();}
-
-  updateChaos(dt,camera.position,discoveries);
-  const t2=Math.max(0,1-(chaosGrp.position.distanceTo(camera.position)/(CELL*2.8)));
-  scene.fog.color.lerpColors(fogBase,fogChaos,t2);
-  scene.background.lerpColors(fogBase,fogChaos,t2);
-
-  renderer.render(scene,camera);
+function mostrarInfo(art) {
+    document.getElementById('info-cat').textContent    = art.cat;
+    document.getElementById('info-titulo').textContent = art.titulo;
+    document.getElementById('info-desc').textContent   = art.texto;
+    const f = document.getElementById('info-formula');
+    if (art.formula) { f.textContent = art.formula; f.style.display = 'inline-block'; }
+    else { f.style.display = 'none'; }
+    painelInfo.style.display = 'block';
 }
 
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-animate();
+// --- LOOP ---
+const clock = new THREE.Clock();
+const VEL_PLAYER = 4.8;
+
+function animar() {
+    requestAnimationFrame(animar);
+    const delta = clock.getDelta();
+    const tempo = clock.getElapsedTime();
+
+    // Rotação sutil dos artefatos
+    artefatos3D.forEach(a => {
+        a.grp.rotation.y += delta * 0.4;
+    });
+    
+    // Animação do Caos
+    caosCorpo.rotation.y += 0.06;
+    caosCorpo.rotation.x += 0.03;
+    caosNucleo.position.y = Math.sin(tempo * 12) * 0.15;
+
+    if (!mouseCapturado) { renderer.render(scene, camera); return; }
+
+    camera.quaternion.setFromEuler(new THREE.Euler(camRot.x, camRot.y, 0, 'YXZ'));
+
+    const frente = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).setY(0).normalize();
+    const lado   = new THREE.Vector3(1,0, 0).applyQuaternion(camera.quaternion).setY(0).normalize();
+    const posAnt = camera.position.clone();
+
+    if (teclas.w) camera.position.addScaledVector(frente,  VEL_PLAYER*delta);
+    if (teclas.s) camera.position.addScaledVector(frente, -VEL_PLAYER*delta);
+    if (teclas.a) camera.position.addScaledVector(lado,   -VEL_PLAYER*delta);
+    if (teclas.d) camera.position.addScaledVector(lado,    VEL_PLAYER*delta);
+    if (colide(camera.position)) camera.position.copy(posAnt);
+
+    const dirCaos = new THREE.Vector3().subVectors(camera.position, caosGrp.position);
+    dirCaos.y = 0;
+    const distCaos = dirCaos.length();
+    dirCaos.normalize();
+
+    const velCaos = caosVelBase + totalDescobertas * 0.45;
+    const antCaos = caosGrp.position.clone();
+
+    caosGrp.position.x += dirCaos.x * velCaos * delta;
+    if (colide(caosGrp.position)) caosGrp.position.x = antCaos.x;
+    caosGrp.position.z += dirCaos.z * velCaos * delta;
+    if (colide(caosGrp.position)) caosGrp.position.z = antCaos.z;
+
+    caosLuz.intensity = Math.min(2.5, totalDescobertas * 0.17);
+
+    // HUD do Caos
+    if (distCaos < 14) {
+        elDistCaos.textContent = `${distCaos.toFixed(1)}m [MUITO PERTO]`;
+        elDistCaos.style.color = '#ff0033';
+        const intensidade = Math.sin(tempo * (18/(distCaos+0.1))) * 65;
+        efeitoPerigo.style.boxShadow = `inset 0 0 ${Math.max(10,intensidade)}px rgba(255,0,50,0.75)`;
+    } else {
+        elDistCaos.textContent = `${distCaos.toFixed(1)}m [SEGURO]`;
+        elDistCaos.style.color = '#000';
+        efeitoPerigo.style.boxShadow = 'inset 0 0 0px rgba(0,0,0,0)';
+    }
+
+    // Game Over
+    if (distCaos < 1.5) {
+        camera.position.set(TAM, 1.6, (LINHAS-2)*TAM);
+        caosGrp.position.set((COLUNAS-2)*TAM, 1.2, TAM);
+        camRot = { x:0, y:0 };
+        totalDescobertas = 0;
+        elContador.textContent = '0 / 15';
+        artefatos3D.forEach(a => a.descoberto = false);
+        alert('O CAOS TE ALCANÇOU! SEU CONHECIMENTO FOI APAGADO.');
+    }
+
+    // Detecção de artefatos
+    let pertoDeArte = false;
+    artefatos3D.forEach(a => {
+        if (camera.position.distanceTo(a.grp.position) < TAM*0.55) {
+            pertoDeArte = true;
+            if (!a.descoberto) {
+                a.descoberto = true;
+                totalDescobertas++;
+                elContador.textContent = `${totalDescobertas} / 15`;
+            }
+            mostrarInfo(a.art);
+        }
+    });
+    if (!pertoDeArte) painelInfo.style.display = 'none';
+
+    renderer.render(scene, camera);
+}
+animar();
+
+window.addEventListener('resize', () => {
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+});
 </script>
 </body>
 </html>
+
+```
